@@ -1,0 +1,23 @@
+{
+  "name": "js-4",
+  "version": "1.0.0",
+  "description": "js-4 complexity meduim",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha ./__tests__/test.js"
+  },
+  "devDependencies": {
+    "assert": "^2.0.0",
+    "mocha": "^9.2.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PCR-JS-2022/JS-4.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PCR-JS-2022/JS-4/issues"
+  },
+  "homepage": "https://github.com/PCR-JS-2022/JS-4#readme"
+}
