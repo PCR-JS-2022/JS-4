@@ -3,7 +3,7 @@
  */
 
 /** Класс биржи */
-class Exchange {
+class ExchangeObserver {
   /**
    * Создаёт экзмепляр биржи
    * @param {Object<string, Array<listenerCallBack>} listeners - словарь, в котором ключи - названия компаний,
@@ -36,12 +36,12 @@ class Exchange {
 class Company {
   /**
    * Создаёт экзмепляр компании
-   * @param {Exchange} exchangeObserver - объект биржи, на которой торгует компания
+   * @param {ExchangeObserver} exchangeObserver - объект биржи, на которой торгует компания
    * @param {string} name - название компании
    * @param {number} [shareCount = 0] - количество акций компании, выставленных на продажу
    * @param {number} [sharePrice = 0] - цена акции за штуку
    */
-  constructor(name, sharePrice, exchangeObserver, shareCount) {}
+  constructor(exchangeObserver, name, shareCount, sharePrice) {}
 
   /**
    * Метод, обновляющий цену акции компании
@@ -54,7 +54,7 @@ class Company {
 class Member {
   /**
    * Создаёт экзмепляр участника торгов
-   * @param {Exchange} exchangeObserver - объект биржи
+   * @param {ExchangeObserver} exchangeObserver - объект биржи
    * @param {number} balance - баланс участника
    * @param {Company[]} [interestingCompanies = []] - компании, за акциями которых участнику было бы интересно следить
    * @param {number} [purchasedSharesNumber = 10] - количество акций компании, выставленных на продажу
@@ -67,4 +67,4 @@ class Member {
   ) {}
 }
 
-module.exports = { Exchange, Company, Member };
+module.exports = { ExchangeObserver, Company, Member };
