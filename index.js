@@ -19,7 +19,11 @@ class ExchangeObserver {
      * @param {Member} member
      */
     sellShares(company, member) {
-        if (!company.bestMomentForSell) {
+        const bestMomentForSell = member.lastPriceBuying
+            ? member.lastPriceBuying > company.sharePrice && company.sharePrice < company.initialPrice && company.sharePrice > company.prevLowPrice
+            : company.sharePrice < company.initialPrice && company.sharePrice > company.prevLowPrice;
+
+        if (!bestMomentForSell) {
             return;
         }
 
@@ -29,6 +33,7 @@ class ExchangeObserver {
         ) {
             member.balance -= member.purchasedSharesNumber * company.sharePrice;
             company.shareCount -= member.purchasedSharesNumber;
+            member.lastPriceBuying = company.sharePrice;
         } else {
             throw new Error('Недостаточно средств для покупки либо у компании недостаточно акций для продажи');
         }
@@ -87,6 +92,7 @@ class Company {
         this.name = name;
         this.shareCount = shareCount;
         this.sharePrice = sharePrice;
+        this.initialPrice = sharePrice;
     }
 
     /**
@@ -97,11 +103,7 @@ class Company {
         if (typeof newPrice !== 'number') {
             return;
         }
-        
-        if (this.prevLowPrice) {
-            this.bestMomentForSell = newPrice > this.prevLowPrice;
-        }
-        this.prevLowPrice = newPrice < this.sharePrice ? newPrice : 0;
+        this.prevLowPrice = this.sharePrice;
         this.sharePrice = newPrice;
         if (this.shareCount) {
             this.exchangeObserver.updateCompany(this);
