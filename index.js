@@ -63,7 +63,7 @@ class ExchangeObserver {
 		if (typeof cb !== 'function')
 			throw new Error('Некорректная функция callback')
 
-		if (companyName in Object.keys(this.listeners)) {
+		if (companyName in this.listeners) {
 			this.listeners[companyName].push(cb)
 		} else {
 			this.listeners[companyName] = [cb]
