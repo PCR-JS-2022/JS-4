@@ -10,7 +10,7 @@ class ExchangeObserver {
    * а значения - функции, которые вызываются при изменении цены акции этой компании
    */
   constructor(listeners) {
-    this.listeners = new Map();
+    this._listeners = new Map();
   }
 
   /**
@@ -35,9 +35,8 @@ class ExchangeObserver {
    * @param {Company} company
    */
   updateCompany(company) {
-    const companyListeners = this.listeners.get(company.name);
-    for(let cb of companyListeners)
-      cb(company);
+    const companyListeners = this._listeners.get(company.name);
+    companyListeners.forEach(cb => cb(company));
   }
 
   /**
@@ -46,10 +45,10 @@ class ExchangeObserver {
    * @param {listenerCallBack} cb
    */
   onUpdateCompany(companyName, cb) {
-    if(this.listeners.has(companyName))
-      this.listeners[companyName].push(cb);
+    if(this._listeners.has(companyName))
+      this._listeners[companyName].push(cb);
     else
-      this.listeners.set(companyName, [cb]);
+      this._listeners.set(companyName, [cb]);
   }
 }
 
@@ -98,7 +97,6 @@ class Member {
     interestingCompanies = [],
     purchasedSharesNumber = 10
   ) {
-    this.companiesPrices = new Map();
       if(balance < 0)
         throw new Error("Баланс не может быть отрицательным");
       if(purchasedSharesNumber < 0)
@@ -107,21 +105,26 @@ class Member {
     this.balance = balance;
     this.interestingCompanies = interestingCompanies;
     this.purchasedSharesNumber = purchasedSharesNumber;
+    this._companiesPrices = new Map();
 
+    
     for(let company of interestingCompanies){
-      this.companiesPrices.set(company.name, [company.sharePrice]);
+      this._companiesPrices.set(company.name, [company.sharePrice]);
       exchangeObserver.onUpdateCompany(
         company.name,
-        (company) => {
-          const companyPrices = this.companiesPrices.get(company.name);
+        this._memberCallback
+      )
+    }
+  }
+
+  _memberCallback = (company) =>
+  {
+    const companyPrices = this._companiesPrices.get(company.name);
           if(companyPrices.length > 1
             && companyPrices[companyPrices.length - 2] > companyPrices[companyPrices.length - 1]
             && companyPrices[companyPrices.length - 1] < company.sharePrice)
               this.exchangeObserver.sellShares(company, this);
-          companyPrices.push(company.sharePrice); 
-        }
-      )
-    }
+          companyPrices.push(company.sharePrice);
   }
 }
 
