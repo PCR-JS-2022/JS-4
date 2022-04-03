@@ -1,5 +1,6 @@
 const { Company, ExchangeObserver, Member } = require("../index");
 const assert = require("assert");
+const { doesNotMatch } = require("assert");
 
 describe("ExchangeObserver", () => {
   it("Объект корректно создается", () => {
