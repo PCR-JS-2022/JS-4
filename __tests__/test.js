@@ -17,7 +17,7 @@ describe("Company", () => {
     const company = new Company(exchange, "Green Bank", 100, 100);
 
     assert.equal(company.name, "Green Bank");
-    assert.equal(company.currentSharePrice, 100);
+    assert.equal(company.sharePrice, 100);
     assert.equal(company.exchangeObserver instanceof ExchangeObserver, true);
     assert.equal(company.shareCount, 100);
     assert.equal(typeof company.updatePrice, "function");
