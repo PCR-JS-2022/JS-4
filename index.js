@@ -19,11 +19,7 @@ class ExchangeObserver {
      * @param {Member} member
      */
     sellShares(company, member) {
-        const bestMomentForSell = member.lastPriceBuying
-            ? member.lastPriceBuying > company.sharePrice && company.sharePrice < company.initialPrice && company.sharePrice > company.prevLowPrice
-            : company.sharePrice < company.initialPrice && company.sharePrice > company.prevLowPrice;
-
-        if (!bestMomentForSell) {
+        if (!company.bestMomentForSell) {
             return;
         }
 
@@ -69,6 +65,12 @@ class ExchangeObserver {
                 [companyName]: [cb]
             }
         } else {
+            if (this.listeners[companyName] === undefined) {
+                this.listeners[companyName] = [cb];
+
+                return;
+            }
+
             for (let listener in this.listeners) {
                 if (listener === companyName) {
                     this.listeners[listener].push(cb);
@@ -103,8 +105,10 @@ class Company {
         if (typeof newPrice !== 'number') {
             return;
         }
+
         this.prevLowPrice = this.sharePrice;
         this.sharePrice = newPrice;
+        this.bestMomentForSell = this.sharePrice < this.initialPrice && this.sharePrice > this.prevLowPrice;
         if (this.shareCount) {
             this.exchangeObserver.updateCompany(this);
         }
