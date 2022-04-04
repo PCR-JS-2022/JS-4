@@ -33,7 +33,7 @@ class ExchangeObserver {
    * @param {Company} company
    */
   updateCompany(company) {
-    this.listeners[company.name].forEach(
+    this.listeners.get(company.name).forEach(
       (el) => el(company)
     );
   }
@@ -45,9 +45,9 @@ class ExchangeObserver {
    */
   onUpdateCompany(companyName, cb) {
     if (!this.listeners.has(companyName)) {
-      this.listeners[companyName] = [];
+      this.listeners.set(companyName, []);
     }
-    this.listeners[companyName].push(cb);
+    this.listeners.get(companyName).push(cb);
   }
 }
 
@@ -116,15 +116,22 @@ module.exports = { ExchangeObserver, Company, Member };
 /*
 const exchange = new ExchangeObserver();
 const greenBank = new Company(exchange, 'Green Bank', 100, 100);
-const kesha = new Member(exchange, 10000, [greenBank], 10);
+const redBank = new Company(exchange, 'Red Bank', 100, 100)
+const kesha = new Member(exchange, 10000, [greenBank, redBank], 10);
+const user2 = new Member(exchange, 10000, [greenBank, redBank], 10);
+console.log(exchange);
 
 greenBank.updatePrice(70);
 greenBank.updatePrice(73);
+redBank.updatePrice(70);
+redBank.updatePrice(73);
 
 // Тут происходит покупка 10 акций по цене 73
 
 console.log(greenBank.shareCount); // 90
-
+console.log(redBank.shareCount); // 90
+*/
+/*
 kesha.purchasedSharesNumber = 100; // Меняем кол-во приобретаемых акций с 10 до 100
 greenBank.updatePrice(40);
 greenBank.updatePrice(45);
