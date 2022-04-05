@@ -4,130 +4,162 @@
 
 /** Класс биржи */
 class ExchangeObserver {
-  /**
-   * Создаёт экзмепляр биржи
-   * @param {Object<string, Array<listenerCallBack>} listeners - словарь, в котором ключи - названия компаний,
-   * а значения - функции, которые вызываются при изменении цены акции этой компании
-   */
-  // constructor(listeners) {
-  //   this.listeners = listeners ?? new Map();
-  // };
-  constructor(listeners = {}) {
-    if (typeof listeners !== "object")
-      throw new Error("Некорректный словарь listeners");
+	/**
+	 * Создаёт экзмепляр биржи
+	 * @param {Object<string, Array<listenerCallBack>} listeners - словарь, в котором ключи - названия компаний,
+	 * а значения - функции, которые вызываются при изменении цены акции этой компании
+	 */
+	constructor(listeners = {}) {
+    this.listeners = listeners ?? new Map();
+	}
 
-    this.listeners = listeners;
-  }
-  /**
-   * Метод, осуществляющий продажу акций компании участнику биржи
-   * @param {Company} company
-   * @param {Member} member
-   */
-  sellShares(company, member) {
-    if (!(company instanceof Company) || !(company instanceof Member)) {
-      throw new Error("Некорректный ввод");
+	/**
+	 * Метод, осуществляющий продажу акций компании участнику биржи
+	 * @param {Company} company
+	 * @param {Member} member
+	 */
+	sellShares(company, member) {
+		if ((!(company instanceof Company)) || (!(member instanceof Member))){
+      throw new Error('Некорректная ввод')
     }
-
-    if (member.purchasedSharesNumber > company.shareCount) {
-      throw new Error("У компании нет нужного количества акций");
+			
+		if (member.purchasedSharesNumber > company.shareCount){
+      throw new Error('Недостаточно акций у компании')
     }
+			
+		const finalPrice = member.purchasedSharesNumber * company.sharePrice
 
-    const finalPrice = member.purchasedSharesNumber * company.shareCount;
-
-    if (finalPrice > member.balance) {
-      throw new Error("У покупателя недостаточно средств");
+		if (finalPrice > member.balance){
+      throw new Error('Недостаточно средств у участника')
     }
+			
+    company.shareCount -= member.purchasedSharesNumber
+		member.balance -= finalPrice
+		
+	}
 
-    member.balance -= finalPrice;
-    company.shareCount -= member.purchasedSharesNumber;
-  }
-
-  /**
-   * Метод, уведомляющий всех подписчиков компании об изменениях
-   * @param {Company} company
-   */
-  updateCompany(company) {
-    this.listeners.get(company.name).forEach((e) => e(company));
-  }
-
-  /**
-   * Метод, позволяющий подписаться на уведомления об изменениях компании
-   * @param {string} companyName
-   * @param {listenerCallBack} cb
-   */
-  onUpdateCompany(companyName, cb) {
-    if (companyName in this.listeners) {
-      this.listeners[companyName].push(cb);
-    } else {
-      this.listeners[companyName] = [cb];
+	/**
+	 * Метод, уведомляющий всех подписчиков компании об изменениях
+	 * @param {Company} company
+	 */
+	updateCompany(company) {
+		if (!(company instanceof Company)){
+      throw new Error('Некорректный ввод')
     }
-  }
+		this.listeners[company.name].forEach(listener => listener(company))
+	}
+
+	/**
+	 * Метод, позволяющий подписаться на уведомления об изменениях компании
+	 * @param {string} companyName
+	 * @param {listenerCallBack} cb
+	 */
+	onUpdateCompany(companyName, cb) {
+		if (typeof companyName !== 'string' || !companyName || typeof cb !== 'function'){
+      throw new Error('Некорректный ввод')
+    }
+			
+		if (companyName in this.listeners) {
+			this.listeners[companyName].push(cb)
+		} 
+    else {
+			this.listeners[companyName] = [cb]
+		}
+	}
 }
+
 /** Класс компании */
 class Company {
-  /**
-   * Создаёт экзмепляр компании
-   * @param {ExchangeObserver} exchangeObserver - объект биржи, на которой торгует компания
-   * @param {string} name - название компании
-   * @param {number} [shareCount = 0] - количество акций компании, выставленных на продажу
-   * @param {number} [sharePrice = 0] - цена акции за штуку
-   */
-  constructor(exchangeObserver, name, shareCount = 0, sharePrice = 0) {
-    this.exchangeObserver = exchangeObserver;
-    this.name = name;
-    this.shareCount = shareCount;
-    this.sharePrice = sharePrice;
-    this.oldPrice = [sharePrice];
-  }
+	/**
+	 * Создаёт экзмепляр компании
+	 * @param {ExchangeObserver} exchangeObserver - объект биржи, на которой торгует компания
+	 * @param {string} name - название компании
+	 * @param {number} [shareCount = 0] - количество акций компании, выставленных на продажу
+	 * @param {number} [sharePrice = 0] - цена акции за штуку
+	 */
+	constructor(exchangeObserver, name, shareCount= 0, sharePrice= 0) {
+		if (!(exchangeObserver instanceof ExchangeObserver)){
+      throw new Error('Некорректная биржа')
+    }
+			
+		if (typeof name !== 'string' || !name){
+      throw new Error('Некорректное имя компании')
+    }
+			
+		if (typeof shareCount !== 'number'){
+      throw new Error('Некорректное кол-во акций')
+    }
+			
+		if (typeof sharePrice !== 'number'){
+      throw new Error('Некорректная цена акции')
+    }
+			
+		this.exchangeObserver = exchangeObserver
+		this.name = name
+		this.shareCount = shareCount
+		this.sharePrice = sharePrice
+		this.previousPrice = sharePrice
+		this.oldPrice = sharePrice
+	}
 
-  /**
-   * Метод, обновляющий цену акции компании
-   * @param {number} newPrice
-   */
-  updatePrice(newPrice) {
-    if (typeof newPrice !== "number") {
-      throw new Error("Некорректная цена акции");
+	/**
+	 * Метод, обновляющий цену акции компании
+	 * @param {number} newPrice
+	 */
+	updatePrice(newPrice) {
+		if (typeof newPrice !== 'number'){
+      throw new Error('Некорректный ввод новой цены акции')
     }
-    this.sharePrice = newPrice;
-    this.oldPrice.push(this.sharePrice);
-    if (this.shareCount > 0) {
-      this.exchangeObserver.updateCompany(this);
-    }
-  }
+			
+		this.oldPrice = this.previousPrice
+		this.previousPrice = this.sharePrice
+		this.sharePrice = newPrice
+
+		if (this.shareCount !== 0) {
+			this.exchangeObserver.updateCompany(this)
+		}
+	}
 }
 
 /** Класс участника торгов */
 class Member {
-  /**
-   * Создаёт экзмепляр участника торгов
-   * @param {ExchangeObserver} exchangeObserver - объект биржи
-   * @param {number} balance - баланс участника
-   * @param {Company[]} [interestingCompanies = []] - компании, за акциями которых участнику было бы интересно следить
-   * @param {number} [purchasedSharesNumber = 10] - количество акций компании, выставленных на продажу
-   */
-  constructor(
-    exchangeObserver,
-    balance,
-    interestingCompanies = [],
-    purchasedSharesNumber = 0
-  ) {
-    this.exchangeObserver = exchangeObserver;
-    this.balance = balance;
-    this.interestingCompanies = interestingCompanies;
-    this.purchasedSharesNumber = purchasedSharesNumber;
+	/**
+	 * Создаёт экзмепляр участника торгов
+	 * @param {ExchangeObserver} exchangeObserver - объект биржи
+	 * @param {number} balance - баланс участника
+	 * @param {Company[]} [interestingCompanies = []] - компании, за акциями которых участнику было бы интересно следить
+	 * @param {number} [purchasedSharesNumber = 10] - количество акций компании, выставленных на продажу
+	 */
+	constructor(exchangeObserver, balance, interestingCompanies = [], purchasedSharesNumber = 10) {
+		if (!(exchangeObserver instanceof ExchangeObserver)){
+      throw new Error('Некорректный ввод названия биржи')
+    }
 
-    this.interestingCompanies.forEach((company) => {
-      this.exchangeObserver.onUpdateCompany(company.name, () => {
-        let lastE = company.oldPrice.length - 1;
-        if (
-          company.oldPrice[lastE - 1] < company.oldPrice[lastE] &&
-          company.oldPrice[lastE - 2] > company.oldPrice[lastE - 1]
-        ) {
-          this.exchangeObserver.sellShares(company, this);
-        }
-      });
-    });
-  }
+		if (typeof balance !== 'number'){
+      throw new Error('Некорректный ввод баланса участника')
+    }
+
+		if (!Array.isArray(interestingCompanies)){
+      throw new Error('Некорректный ввод массива компаний')
+    }
+
+		if (typeof purchasedSharesNumber !== 'number'){
+      throw new Error('Некорректное ввод количества покупаемых акций')
+    }
+			
+		this.exchangeObserver = exchangeObserver
+		this.balance = balance
+		this.interestingCompanies = interestingCompanies
+		this.purchasedSharesNumber = purchasedSharesNumber
+
+		this.interestingCompanies.forEach(company => {
+			this.exchangeObserver.onUpdateCompany(company.name, () => {
+				if (company.previousPrice < company.sharePrice && company.oldPrice > company.previousPrice) {
+					this.exchangeObserver.sellShares(company, this)
+				}
+			})
+		})
+	}
 }
 
-module.exports = { ExchangeObserver, Company, Member };
+module.exports = {ExchangeObserver, Company, Member};
