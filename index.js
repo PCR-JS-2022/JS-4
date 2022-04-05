@@ -44,10 +44,9 @@ class ExchangeObserver {
    * @param {listenerCallBack} cb
    */
   onUpdateCompany(companyName, cb) {
-    if (this.listeners.has(companyName)) {
-      this.listeners[companyName].push(cb)
-    }
-    this.listeners[companyName] = [cb]
+    (this.listeners[companyName])
+      ? this.listeners[companyName].push(cb)
+      : this.listeners[companyName] = [cb]
   }
 }
 
@@ -90,7 +89,7 @@ class Member {
    * @param {Company[]} [interestingCompanies = []] - компании, за акциями которых участнику было бы интересно следить
    * @param {number} [purchasedSharesNumber = 10] - количество акций компании, выставленных на продажу
    */
-  constructor(exchangeObserver, balance, interestingCompanies = 0, purchasedSharesNumber = []) {
+  constructor(exchangeObserver, balance, interestingCompanies = [], purchasedSharesNumber = 0) {
     this.exchangeObserver = exchangeObserver
     this.balance = balance
     this.interestingCompanies = interestingCompanies
@@ -112,27 +111,17 @@ module.exports = { ExchangeObserver, Company, Member };
 
 
 /*
-const exchange = new ExchangeObserver();
-const greenBank = new Company(exchange, 'Green Bank', 100, 100);
-const beebBank = new Company(exchange, 'BeebBank', 90, 90);
-const kesha = new Member(exchange, 10000, [greenBank, beebBank], 10);
+Тут я хочу чтобы мне проверили js1
 
-greenBank.updatePrice(70);
-greenBank.updatePrice(73);
-beebBank.updatePrice(60);
-beebBank.updatePrice(63);
-//Тут я хочу чтобы мне проверили js1
+...........#####...........#####.................#####
+...........#####.......############............#######
+...........#####......#####....#####........##########
+...........#####.......#####..............#####..#####
+...........#####..........#####..................#####
+...........#####.............#####...............#####
+..#####....#####......#####....#####.............#####
+...############........############..............#####
+.......#####...............#####.................#####
 
-console.log(greenBank.shareCount); // Js1
-
-kesha.purchasedSharesNumber = 40; // Тут я хочу чтобы потрогали мой js1
-greenBank.updatePrice(40);
-greenBank.updatePrice(45);
-beebBank.updatePrice(30);
-beebBank.updatePrice(35);
-
-//Тут я хочу чтобы мне проверили js1
-//js1 js1 js1 js1 js1 js1 js1 js1 js1 js1 js1 js1
-
-let adin = 1
+Тут я хочу чтобы мне проверили js1
 */
