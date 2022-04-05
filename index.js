@@ -55,7 +55,7 @@ class ExchangeObserver {
     if(typeof companyName !== "string" || typeof cb !== "function") {
       throw new Error("Некорректные данные");
     }
-    if (this.listeners.companyName) {
+    if (this.listeners[companyName]) {
       this.listeners[companyName].push(cb);
     } else {
       this.listeners[companyName] = [cb];
@@ -124,4 +124,17 @@ class Member {
   }    
 }
 
+const exchange = new ExchangeObserver();
+const greenBank = new Company(exchange, 'Green Bank', 100, 100);
+const kesha = new Member(exchange, 10000, [greenBank], 10);
+
+greenBank.updatePrice(70);
+greenBank.updatePrice(73);
+
+// Тут происходит покупка 10 акций по цене 73
+
+console.log(greenBank.shareCount);
+kesha.purchasedSharesNumber = 100; // Меняем кол-во приобретаемых акций с 10 до 100
+greenBank.updatePrice(40);
+greenBank.updatePrice(45);
 module.exports = { ExchangeObserver, Company, Member };
