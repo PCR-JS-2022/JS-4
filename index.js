@@ -42,9 +42,8 @@ class ExchangeObserver {
       throw new Error('member\'s balance is low');
     }
 
-    company.shareCount = company.shareCount - member.purchasedSharesNumber;
+    company.shareCount -= member.purchasedSharesNumber;
     member.balance -= member.purchasedSharesNumber * company.sharePrice;
-    member.purchasedSharesNumber += member.purchasedSharesNumber;
   }
 
   /**
@@ -172,7 +171,7 @@ class Member {
     this.balance = balance;
     this.interestingCompanies = interestingCompanies;
     this.purchasedSharesNumber = purchasedSharesNumber;
-
+    
     this.interestingCompanies.forEach(company => {
       this.exchangeObserver.onUpdateCompany(company.name, (cmp) => {
         exchangeObserver.sellShares(cmp, this);
