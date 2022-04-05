@@ -9,29 +9,37 @@ class ExchangeObserver {
    * @param {Object<string, Array<listenerCallBack>} listeners - словарь, в котором ключи - названия компаний,
    * а значения - функции, которые вызываются при изменении цены акции этой компании
    */
-  constructor(listeners) {
-    this.listeners = listeners; 
-    // ?? new Map();
-  };
+  // constructor(listeners) {
+  //   this.listeners = listeners ?? new Map();
+  // };
+  constructor(listeners = {}) {
+    if (typeof listeners !== "object")
+      throw new Error("Некорректный словарь listeners");
 
+    this.listeners = listeners;
+  }
   /**
    * Метод, осуществляющий продажу акций компании участнику биржи
    * @param {Company} company
    * @param {Member} member
    */
   sellShares(company, member) {
-    if(member.purchasedSharesNumber > company.shareCount){
-      throw new Error('У компании нет нужного количества акций')
+    if (!(company instanceof Company) || !(company instanceof Member)) {
+      throw new Error("Некорректный ввод");
+    }
+
+    if (member.purchasedSharesNumber > company.shareCount) {
+      throw new Error("У компании нет нужного количества акций");
     }
 
     const finalPrice = member.purchasedSharesNumber * company.shareCount;
 
-    if(finalPrice > member.balance){
-      throw new Error('У покупателя недостаточно средств');
+    if (finalPrice > member.balance) {
+      throw new Error("У покупателя недостаточно средств");
     }
 
     member.balance -= finalPrice;
-    company.shareCount -= member.purchasedSharesNumber; 
+    company.shareCount -= member.purchasedSharesNumber;
   }
 
   /**
@@ -39,9 +47,7 @@ class ExchangeObserver {
    * @param {Company} company
    */
   updateCompany(company) {
-    this.listeners.get(company.name).forEach(
-      (e) => e(company)
-    );
+    this.listeners.get(company.name).forEach((e) => e(company));
   }
 
   /**
@@ -51,9 +57,9 @@ class ExchangeObserver {
    */
   onUpdateCompany(companyName, cb) {
     if (companyName in this.listeners) {
-			this.listeners[companyName].push(cb)
-		} else {
-			this.listeners[companyName] = [cb]
+      this.listeners[companyName].push(cb);
+    } else {
+      this.listeners[companyName] = [cb];
     }
   }
 }
@@ -71,7 +77,7 @@ class Company {
     this.name = name;
     this.shareCount = shareCount;
     this.sharePrice = sharePrice;
-		this.oldPrice = [sharePrice];
+    this.oldPrice = [sharePrice];
   }
 
   /**
@@ -79,11 +85,14 @@ class Company {
    * @param {number} newPrice
    */
   updatePrice(newPrice) {
+    if (typeof newPrice !== "number") {
+      throw new Error("Некорректная цена акции");
+    }
     this.sharePrice = newPrice;
-    this.oldPrice.push(this.sharePrice)
+    this.oldPrice.push(this.sharePrice);
     if (this.shareCount > 0) {
-      this.exchangeObserver.updateCompany(this)
-    } 
+      this.exchangeObserver.updateCompany(this);
+    }
   }
 }
 
@@ -96,22 +105,29 @@ class Member {
    * @param {Company[]} [interestingCompanies = []] - компании, за акциями которых участнику было бы интересно следить
    * @param {number} [purchasedSharesNumber = 10] - количество акций компании, выставленных на продажу
    */
-  constructor(exchangeObserver, balance, interestingCompanies = [], purchasedSharesNumber = 0) {
-    this.exchangeObserver = exchangeObserver
-		this.balance = balance
-		this.interestingCompanies = interestingCompanies
-		this.purchasedSharesNumber = purchasedSharesNumber
+  constructor(
+    exchangeObserver,
+    balance,
+    interestingCompanies = [],
+    purchasedSharesNumber = 0
+  ) {
+    this.exchangeObserver = exchangeObserver;
+    this.balance = balance;
+    this.interestingCompanies = interestingCompanies;
+    this.purchasedSharesNumber = purchasedSharesNumber;
 
-    this.interestingCompanies.forEach(company => {
+    this.interestingCompanies.forEach((company) => {
       this.exchangeObserver.onUpdateCompany(company.name, () => {
-        let lastE = company.oldPrice.length - 1
-        if ( company.oldPrice[lastE - 1] < company.oldPrice[lastE] && company.oldPrice[lastE - 2] > company.oldPrice[lastE - 1]) {
-          this.exchangeObserver.sellShares(company, this)
+        let lastE = company.oldPrice.length - 1;
+        if (
+          company.oldPrice[lastE - 1] < company.oldPrice[lastE] &&
+          company.oldPrice[lastE - 2] > company.oldPrice[lastE - 1]
+        ) {
+          this.exchangeObserver.sellShares(company, this);
         }
-      })
-		})
+      });
+    });
   }
 }
 
 module.exports = { ExchangeObserver, Company, Member };
-
