@@ -59,22 +59,45 @@ class ExchangeObserver {
 	}
 }
 
-/** Класс компании */
 class Company {
-  /**
-   * Создаёт экзмепляр компании
-   * @param {ExchangeObserver} exchangeObserver - объект биржи, на которой торгует компания
-   * @param {string} name - название компании
-   * @param {number} [shareCount = 0] - количество акций компании, выставленных на продажу
-   * @param {number} [sharePrice = 0] - цена акции за штуку
-   */
-  constructor(exchangeObserver, name, shareCount, sharePrice) {}
+	/**
+	 * @param {ExchangeObserver} exchangeObserver
+	 * @param {string} name
+	 * @param {number} [shareCount = 0]
+	 * @param {number} [sharePrice = 0]
+	 */
+	constructor(exchangeObserver, name, shareCount = 0, sharePrice = 0) {
+		if (!(exchangeObserver instanceof ExchangeObserver
+			&& typeof name === 'string' && name
+			&& typeof shareCount === 'number'
+			&& typeof sharePrice === 'number')) {
+			throw new Error("Invalid input data");
+		}
 
-  /**
-   * Метод, обновляющий цену акции компании
-   * @param {number} newPrice
-   */
-  updatePrice(newPrice) {}
+		this.exchangeObserver = exchangeObserver;
+		this.name = name;
+		this.sharePrice = sharePrice;
+		this.prevPrice = sharePrice;
+		this.prevPrevPrice = sharePrice;
+		this.shareCount = shareCount;
+	}
+
+	/**
+	 * @param {number} newPrice
+	 */
+	updatePrice(newPrice) {
+		if (typeof newPrice !== 'number') {
+			throw new Error("Invalid input data");
+		}
+
+		this.prevPrevPrice = this.prevPrice;
+		this.prevPrice = this.sharePrice;
+		this.sharePrice = newPrice;
+
+		if (this.shareCount !== 0) {
+			this.exchangeObserver.updateCompany(this);
+		}
+	}
 }
 
 /** Класс участника торгов */
