@@ -2,34 +2,60 @@
  * @typedef {(company: Company) => void} listenerCallBack
  */
 
-/** Класс биржи */
 class ExchangeObserver {
-  /**
-   * Создаёт экзмепляр биржи
-   * @param {Object<string, Array<listenerCallBack>} listeners - словарь, в котором ключи - названия компаний,
-   * а значения - функции, которые вызываются при изменении цены акции этой компании
-   */
-  constructor(listeners) {}
+	/**
+	 * @param {Object<string, Array<listenerCallBack>} listeners
+	 */
+	constructor(listeners = {}) {
+		if (typeof listeners !== 'object') {
+			throw new Error("Invalid input data");
+		}
+		this.listeners = listeners
+	}
 
-  /**
-   * Метод, осуществляющий продажу акций компании участнику биржи
-   * @param {Company} company
-   * @param {Member} member
-   */
-  sellShares(company, member) {}
+	/**
+	 * @param {Company} company
+	 * @param {Member} member
+	 */
+	sellShares(company, member) {
+		if (!(company instanceof Company && member instanceof Member)) {
+			throw new Error("Invalid input data");
+		}
 
-  /**
-   * Метод, уведомляющий всех подписчиков компании об изменениях
-   * @param {Company} company
-   */
-  updateCompany(company) {}
+		const price = member.purchasedSharesNumber * company.sharePrice;
 
-  /**
-   * Метод, позволяющий подписаться на уведомления об изменениях компании
-   * @param {string} companyName
-   * @param {listenerCallBack} cb
-   */
-  onUpdateCompany(companyName, cb) {}
+		if (price > member.balance || member.purchasedSharesNumber > company.shareCount) {
+			throw new Error("Transaction is impossible");
+		}
+
+		company.shareCount -= member.purchasedSharesNumber;
+		member.balance -= price;
+	}
+
+	/**
+	 * @param {Company} company
+	 */
+	updateCompany(company) {
+		if (!company instanceof Company) {
+			throw new Error("Invalid input data");
+		}
+
+		this.listeners[company.name].reduce(listener => listener(company));
+	}
+
+	/**
+	 * @param {string} companyName
+	 * @param {listenerCallBack} callBack
+	 */
+	onUpdateCompany(companyName, callBack) {
+		if (!(typeof callBack === 'function' && typeof companyName === 'string' && companyName)) {
+			throw new Error("Invalid input data");
+		}
+
+		(companyName in this.listeners)
+			? this.listeners[companyName].push(callBack)
+			: this.listeners[companyName] = [callBack];
+	}
 }
 
 /** Класс компании */
