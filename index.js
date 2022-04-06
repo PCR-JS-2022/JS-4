@@ -7,10 +7,9 @@ class ExchangeObserver {
 	 * @param {Object<string, Array<listenerCallBack>} listeners
 	 */
 	constructor(listeners = {}) {
-		if (typeof listeners !== 'object') {
-			throw new Error("Invalid input data");
-		}
-		this.listeners = listeners
+		typeof listeners === 'object'
+			? this.listeners = listeners
+			: throw new Error("Invalid input data");
 	}
 
 	/**
@@ -36,11 +35,9 @@ class ExchangeObserver {
 	 * @param {Company} company
 	 */
 	updateCompany(company) {
-		if (!company instanceof Company) {
-			throw new Error("Invalid input data");
-		}
-
-		this.listeners[company.name].reduce(listener => listener(company));
+		company instanceof Company
+			? this.listeners[company.name].forEach(listener => listener(company))
+			: throw new Error("Invalid input data");
 	}
 
 	/**
@@ -52,7 +49,7 @@ class ExchangeObserver {
 			throw new Error("Invalid input data");
 		}
 
-		(companyName in this.listeners)
+		companyName in this.listeners
 			? this.listeners[companyName].push(callBack)
 			: this.listeners[companyName] = [callBack];
 	}
