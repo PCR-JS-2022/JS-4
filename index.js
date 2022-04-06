@@ -66,7 +66,7 @@ class Company {
   
   updatePrice(newPrice) {
     
-    if (!typeof(newPrice) === "number" || !newPrice)
+    if (!typeof(newPrice) === "number")
       throw new Error ("Входные данные не корреткны");
     
     if (newPrice > this.sharePrice){
