@@ -1,7 +1,7 @@
 class ExchangeObserver {
 
   constructor(listeners = {}) { 
-    if (! listeners instanceof 'object')
+    if (typeof listeners !== 'object')
 			throw new Error('Неверные входные данные')
     this.listeners = listeners;
   };
