@@ -1,7 +1,8 @@
-
 class ExchangeObserver {
 
   constructor(listeners = {}) { 
+    if (! listeners instanceof 'object')
+			throw new Error('Неверные входные данные')
     this.listeners = listeners;
   };
   
@@ -36,13 +37,11 @@ class ExchangeObserver {
     if (!cb === 'function')
       throw new Error('вторым параметром должна быть функция');
 
-    if (this.listeners[companyName] === undefined){
-      this.listeners = {
-        [companyName]: [cb]
-      };
-    }
-    else 
-      this.listeners[companyName].push(cb);
+    if (companyName in this.listeners) {
+			this.listeners[companyName].push(cb)
+		} else {
+			this.listeners[companyName] = [cb]
+		}
   };
 };
 
@@ -119,4 +118,3 @@ class Member {
 };
 
 module.exports = { ExchangeObserver, Company, Member };
-
