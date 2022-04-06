@@ -100,21 +100,34 @@ class Company {
 	}
 }
 
-/** Класс участника торгов */
 class Member {
-  /**
-   * Создаёт экзмепляр участника торгов
-   * @param {ExchangeObserver} exchangeObserver - объект биржи
-   * @param {number} balance - баланс участника
-   * @param {Company[]} [interestingCompanies = []] - компании, за акциями которых участнику было бы интересно следить
-   * @param {number} [purchasedSharesNumber = 10] - количество акций компании, выставленных на продажу
-   */
-  constructor(
-    exchangeObserver,
-    balance,
-    interestingCompanies,
-    purchasedSharesNumber
-  ) {}
+	/**
+	 * @param {ExchangeObserver} exchangeObserver
+	 * @param {number} balance
+	 * @param {Company[]} [interestingCompanies = []]
+	 * @param {number} [purchasedSharesNumber = 10]
+	 */
+	constructor(exchangeObserver, balance, interestingCompanies = [], purchasedSharesNumber = 10) {
+		if (!(exchangeObserver instanceof ExchangeObserver
+				&& typeof balance === 'number'
+				&& typeof purchasedSharesNumber === 'number')
+			&& Array.isArray(interestingCompanies)) {
+			throw new Error("Invalid input data");
+		}
+
+		this.exchangeObserver = exchangeObserver;
+		this.balance = balance;
+		this.interestingCompanies = interestingCompanies;
+		this.purchasedSharesNumber = purchasedSharesNumber;
+
+		this.interestingCompanies.forEach(interestingCompany => {
+			this.exchangeObserver.onUpdateCompany(interestingCompany.name, () => {
+				if (interestingCompany.prevPrice >= interestingCompany.sharePrice || interestingCompany.prevPrevPrice <= interestingCompany.prevPrice)
+					return;
+				this.exchangeObserver.sellShares(interestingCompany, this);
+			});
+		});
+	}
 }
 
 module.exports = { ExchangeObserver, Company, Member };
