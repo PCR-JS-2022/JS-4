@@ -116,15 +116,3 @@ class Member {
 }
 
 module.exports = { ExchangeObserver, Company, Member };
-const exchange = new ExchangeObserver();
-const greenBank = new Company(exchange, 'Green Bank', 100, 100);
-const beebBank = new Company(exchange, 'BeebBank', 90, 90);
-const kesha = new Member(exchange, 10000, [greenBank, beebBank], 10);
-const huesha = new Member(exchange, 9000, [greenBank, beebBank], 13);
-
-greenBank.updatePrice(70);
-greenBank.updatePrice(73);
-greenBank.updatePrice(73);
-greenBank.updatePrice(75);
-greenBank.updatePrice(73);
-greenBank.updatePrice(75.5);
