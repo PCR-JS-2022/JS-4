@@ -24,7 +24,7 @@ class ExchangeObserver {
     if (member.purchasedSharesNumber > company.shareCount ||
       member.purchasedSharesNumber * company.sharePrice > member.balance)
       throw new Error("rofl");
-    company.shareCount = company.shareCount - 1;
+    company.shareCount -= member.purchasedSharesNumber;
     member.balance = member.balance - member.purchasedSharesNumber * company.sharePrice;
   }
 
