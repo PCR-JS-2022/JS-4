@@ -122,7 +122,7 @@ class Member {
         if (!Array.isArray(interestingCompanies)) {
             throw new Error('Интересные компании должны быть массивом!');
         }
-        if (typeof purchasedSharesNumber !== 'number'){
+        if (typeof purchasedSharesNumber !== 'number') {
             throw new Error('Количество акций должно быть числом!');
         }
         this.exchangeObserver = exchangeObserver;
@@ -143,7 +143,8 @@ class Member {
         if (!(company instanceof Company)) {
             throw new Error('Передан не объект компании!');
         }
-        return (company.sharePriceHistory.previousPriceShare < company.sharePriceHistory.previousPreviousPriceShare && company.sharePrice > company.sharePriceHistory.previousPriceShare)
+        return (company.sharePriceHistory.previousPriceShare < company.sharePriceHistory.previousPreviousPriceShare &&
+            company.sharePrice > company.sharePriceHistory.previousPriceShare)
     }
 }
 
