@@ -10,9 +10,8 @@ class ExchangeObserver {
    * а значения - функции, которые вызываются при изменении цены акции этой компании
    */
   constructor(listeners) {
-    if (typeof listeners !== 'object')
-			throw new Error('Некорректный словарь listeners')
-		this.listeners = listeners
+    this.listeners = listeners === undefined ? 
+    new Map() : listeners;
   }
 
 
@@ -22,9 +21,6 @@ class ExchangeObserver {
    * @param {Member} member
    */
   sellShares(company, member) {
-    if (typeof name !== 'string' || !name)
-			throw new Error('Некорректное имя компании')
-
     if (member.purchasedSharesNumber > company.shareCount)
       throw new Error('Некорректное кол-во акций');
 
