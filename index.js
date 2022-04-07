@@ -50,7 +50,7 @@ class ExchangeObserver {
      */
     onUpdateCompany(companyName, cb) {
         if (this.listeners.has(companyName)) {
-            this.listeners[companyName].push(cb);
+            this.listeners.get(companyName).push(cb);
         } else {
             this.listeners.set(companyName, [cb]);
         }
