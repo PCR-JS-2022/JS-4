@@ -77,12 +77,18 @@ class Company {
   }
   decision(newPrice, prevPrice, prevPrevPrice) {
     if (prevPrevPrice === false
-      && newPrice > prevPrice)
+      && newPrice > prevPrice) {
       this.Poland = true;
-    if (newPrice === prevPrice)
+      return;
+    }
+    if (newPrice === prevPrice) {
       this.Poland = undefined;
-    if (newPrice < prevPrice)
+      return;
+    }
+    if (newPrice < prevPrice || this.Poland === true) {
       this.Poland = false;
+      return;
+    }
   }
 }
 
