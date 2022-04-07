@@ -67,7 +67,7 @@ class Company {
     this.shareCount = shareCount;
     this.sharePrice = sharePrice;
     this.prevPrice = sharePrice;
-    this.prevPrevPrice = shareCount;
+    this.prevPrevPrice = sharePrice;
   }
 
   /**
