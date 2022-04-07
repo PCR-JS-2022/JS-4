@@ -10,7 +10,12 @@ class ExchangeObserver {
    * а значения - функции, которые вызываются при изменении цены акции этой компании
    */
   constructor(listeners) {
-    this.listeners = listeners;
+    if (!listeners) {
+      this.listeners = new Map();
+    }
+    else {
+      this.listeners = listeners;
+    }
   }
 
   /**
