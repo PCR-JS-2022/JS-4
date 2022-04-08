@@ -57,11 +57,7 @@ class ExchangeObserver {
         if (typeof companyName !== "string" || typeof cb !== "function")
             throw new Error("Невалидные данные");
 
-        if (!Array.isArray(this.listeners[companyName])) {
-            this.listeners[companyName] = [cb];
-        } else {
-            this.listeners[companyName].push(cb);
-        }
+        this.listeners[companyName] = this.listeners[companyName] === undefined ? [cb] : this.listeners[companyName].push(cb);
     }
 }
 
