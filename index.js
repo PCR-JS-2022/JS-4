@@ -133,4 +133,4 @@ class Member {
   }
 }
 
-// module.exports = { ExchangeObserver, Company, Member };
+module.exports = { ExchangeObserver, Company, Member };
